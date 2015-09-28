@@ -16,7 +16,7 @@ output in the format (R, S, [W1, W2, ... Wn]).
 For words with multiple possible POS (eg: "record"),
 applies the NLTK tagger and searches only for words with the same POS.
 For words with multiple possible pronunciations, searches through all pronunciations. eg:
-route + sturdy = stout
+route + sturdy = stout, 
 route + shrewd = astute
 """
 
