@@ -8,7 +8,7 @@
 
 """Scans a text to find 'poetry possibilities.'
 
-That is, for all permutations of words in text {T},
+That is, for all combinations of words in text {T},
 this returns all words {W:W⊂U)}  that rhyme (share a rime) with word {R:R⊂T}
 while also being synonymous with another word {S:S⊂T},
 output in the format (R, S, [W1, W2, ... Wn]).
@@ -84,8 +84,8 @@ def check_pos(tagged_word):
 
 def tagged_thesaurus(tagged_word):
     """"returns synonyms of a word of the same POS
-    th("slow", "v") --> [u'decelerate', u'slow', u'slow_down', ... ]
-    th("slow", "a") --> [u'slow', u'dense', u'dim', u'dull', ...]"""
+    tagged_thesaurus("slow", "v") --> [u'decelerate', u'slow', u'slow_down', ... ]
+    tagged_thesaurus("slow", "a") --> [u'slow', u'dense', u'dim', u'dull', ...]"""
     synonym_list = []
     word = tagged_word[0].lower()
     pos = check_pos(tagged_word)
@@ -115,8 +115,8 @@ def check_rhyme(word1, word2):
             return True
 
 def tagged_rhyme_and_relate(rhyme, tagged_relate):
-    """finds words that rhyme with word A and are also synonymous with word B
-    rnr(("route", "NN"), "sturdy") --> [u'stout']"""
+    """finds words that rhyme with word A and are also synonymous with word B and have same POS
+    tagged_rhyme_and_relate(("route", "NN"), "sturdy") --> [u'stout']"""
     synonyms = tagged_thesaurus(tagged_relate)
     return [word for word in synonyms if
             check_rhyme(rhyme.lower(), word) and word.lower() != rhyme and word.lower() !=tagged_relate[0]]
