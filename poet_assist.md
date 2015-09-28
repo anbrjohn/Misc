@@ -9,7 +9,7 @@
 """Scans a text to find 'poetry possibilities.'
 
 That is, for all combinations of words in text {T},
-this returns all words {W:W⊂U)}  that rhyme (share a rime) with word {R:R⊂T}
+this returns all words {W:W⊂U}  that rhyme (share a rime) with word {R:R⊂T}
 while also being synonymous with another word {S:S⊂T},
 output in the format (R, S, [W1, W2, ... Wn]).
 
