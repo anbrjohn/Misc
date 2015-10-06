@@ -50,7 +50,8 @@ def basic_rime(pronunciation):
     return basic_rime
 
 def rime(word):
-    """returns the rime of all pronunciations as a string
+    """for words with multiple possible pronunciations,
+    returns the rime of all pronunciations as a string
     rime("route") --> [[u'UWT'], [u'AWT']]"""
     rimes = []
     if word.lower() in dictionary:
@@ -65,7 +66,7 @@ def tag(sent):
     tag("Did you record that record?") -->
     [('Did', 'NNP'), ('you', 'PRP'), ('record', 'VB'), ('that', 'DT'), ('record', 'NN'), ('?', '.')]
     However, tagger tends to tag initial adjectives as nouns for some reason."""
-    sent = nltk.word_tokenize(sent)
+    sent = nltk.word_tokenize(sent.lower())
     sent_tagged = nltk.pos_tag(sent)
     return sent_tagged
 
@@ -124,15 +125,20 @@ def tagged_rhyme_and_relate(rhyme, tagged_relate):
 ###
 
 def find(rhyme, text):
+    """searches a given text for words that have synonyms rhyming with a given word
+     find("head", "The sun was crimson.") --> [('head', 'crimson', [u'red'])]"""
     text = tag(text)
     words = []
     for tagged_word in text:
         one_set = tagged_rhyme_and_relate(rhyme, tagged_word)
         if len(one_set) > 0:
-            words += [(rhyme, tagged_word[0], one_set)]
+            if rhyme != tagged_word[0]:
+                words += [(rhyme, tagged_word[0], one_set)]
     return words
 
 def full_find(text):
+    """searches a text for words that have synonyms rhyming with other words in the text
+    full_find("Upon his head, every hair was crimson.") --> ('head', 'crimson', [u'red'])  *among others"""
     split_text = re.split(" ", text) #splits into words.
     split_text = [word.strip(r"!?\"\',.") for word in split_text] #removes basic punctuation
     all_words = [] 
@@ -144,3 +150,10 @@ def suggestions(text):
     all_words = full_find(text)
     for entry in all_words:
         print "Try replacing '%s' with %s, which rhymes with '%s'." % (entry[1], entry[2], entry[0])
+
+###
+
+print "Let's search for poetry possibilities."
+text = input("Enter text: ")
+print suggestions(text)
+
