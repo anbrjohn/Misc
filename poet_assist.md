@@ -20,7 +20,6 @@ route + sturdy = stout,
 route + shrewd = astute
 """
 
-from __future__ import division
 import nltk
 from collections import defaultdict
 import re #regular expressions
@@ -84,7 +83,7 @@ def check_pos(tagged_word):
         return "a"
 
 def tagged_thesaurus(tagged_word):
-    """"returns synonyms of a word of the same POS
+    """returns synonyms of a word of the same POS
     tagged_thesaurus("slow", "v") --> [u'decelerate', u'slow', u'slow_down', ... ]
     tagged_thesaurus("slow", "a") --> [u'slow', u'dense', u'dim', u'dull', ...]"""
     synonym_list = []
