@@ -146,13 +146,34 @@ def full_find(text):
     return all_words
 
 def suggestions(text):
+    """Formats an easily-readable output
+    suggestions("For the mind") --->
+    Try replacing 'MIND' with THINKER, which rhymes with 'FOR'.
+    Try replacing 'MIND' with IDEA or PSYCHE, which rhyme with 'THE'."""
     all_words = full_find(text)
     for entry in all_words:
-        print "Try replacing '%s' with %s, which rhymes with '%s'." % (entry[1], entry[2], entry[0])
+        original = entry[1].upper()
+        rhymewith = entry[0].upper()
+        suggested = entry[2]
+        l = len(suggested)
+        if l == 1:
+            suggested = suggested[0].upper()
+        else:
+            all_suggested = ""
+            for i in range(l):
+                all_suggested += suggested[i-1].upper()
+                if i == l -2:
+                    all_suggested += " or "
+                if i < l - 2:
+                    all_suggested += ", "
+            suggested = all_suggested
+        if l == 1:
+            print "Try replacing '%s' with %s, which rhymes with '%s'." % (original, suggested, rhymewith)
+        else:
+            print "Try replacing '%s' with %s, which rhyme with '%s'." % (original, suggested, rhymewith)
 
-###
 
-print "Let's search for poetry possibilities."
-text = input("Enter text: ")
-print suggestions(text)
-
+def run():
+    print "Let's search for poetry possibilities."
+    text = raw_input("Enter text: ")
+    return suggestions(text)
