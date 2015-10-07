@@ -122,7 +122,7 @@ def tagged_rhyme_and_relate(rhyme, tagged_relate):
 
 def find(rhyme, text):
     """searches a given text for words that have synonyms rhyming with a given word, returning a list of tuples
-     find("head", "The sun was crimson.") --> [('head', 'crimson', [u'red'])]"""
+     find("head", "The sun was crimson.") --> ... [('head', 'crimson', [u'red'])] ..."""
     text = tag(text)
     words = []
     for tagged_word in text:
