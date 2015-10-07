@@ -14,13 +14,13 @@ while also being synonymous with another word in it {S:S⊂T},
 output by the function full_find as a list of tuples in the format (R, S, [W1, W2, ... Wn]).
 
 For words with multiple possible pronunciations, this searches through all pronunciations.
-eg:  synonymous with "sturdy" and rhymes with "route" --> "stout"
-     synonymous with "shrewd" and rhymes with "route" --> "astute"
+eg: synonymous with "sturdy" and rhymes with "route" --> "stout"
+    synonymous with "shrewd" and rhymes with "route" --> "astute"
 
 Additionally, for words with multiple possible POS,
 this applies the NLTK tagger and searches only for words with the same POS.
-eg:  synonymous with permit (v) and rhymes with "hate" --> "tolerate"
-     synonymous with permit (n) and rhymes with "hate" --> ∅"""
+eg: synonymous with permit (v) and rhymes with "hate" --> "tolerate"
+    synonymous with permit (n) and rhymes with "hate" --> ∅"""
 
 import nltk
 from collections import defaultdict
@@ -44,7 +44,7 @@ def basic_rime(pronunciation):
     """returns the rime of the final syllable of a *single* pronunciation as a list
     basic_rime([u'P', u'AY1', u'TH', u'AA0', u'N']) --> u'AAN' """
     destressed = [phoneme.strip(r"[012]") for phoneme in pronunciation] #removes stress
-    pronunciation = "".join(destressed) #combines phonomes into one string
+    pronunciation = "".join(destressed) #combines phonemes into one string
     final_vowel = re.findall(r'[AEIOU]+', pronunciation)[-1] #determines final vowel in word
     location = pronunciation.rindex(final_vowel) #determines location of final vowel
     basic_rime = pronunciation[location:]
@@ -97,10 +97,6 @@ def tagged_thesaurus(tagged_word):
         if pos == syn_pos:
             synonym_set = meaning.lemma_names()
             [synonym_list.append(syn) for syn in synonym_set if syn not in synonym_list]
-            #also evalutes nouns as adjectives because nltk tagger has a bad habit of mis-tagging
-        #elif pos == "n" and syn_pos == "a":
-#            synonym_set = meaning.lemma_names()
-#            [synonym_list.append(syn) for syn in synonym_set if syn not in synonym_list]
     return synonym_list
 
 ###
