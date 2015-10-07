@@ -8,17 +8,19 @@
 
 """Scans a text to find 'poetry possibilities.'
 
-That is, for all combinations of words in text {T},
-this returns all words {W:W⊂U}  that rhyme (share a rime) with word {R:R⊂T}
-while also being synonymous with another word {S:S⊂T},
-output in the format (R, S, [W1, W2, ... Wn]).
+For all combinations of words in text {T}, this returns all words {W:W⊂U}
+that rhyme (share a rime) with a word in the text {R:R⊂T}
+while also being synonymous with another word in it {S:S⊂T},
+output by the function full_find as a list of tuples in the format (R, S, [W1, W2, ... Wn]).
 
-For words with multiple possible POS (eg: "record"),
-applies the NLTK tagger and searches only for words with the same POS.
-For words with multiple possible pronunciations, searches through all pronunciations. eg:
-route + sturdy = stout, 
-route + shrewd = astute
-"""
+For words with multiple possible pronunciations, this searches through all pronunciations.
+eg: synonymous with "sturdy" and rhymes with "route" --> "stout"
+     synonymous with "shrewd" and rhymes with "route" --> "astute"
+
+Additionally, for words with multiple possible POS,
+this applies the NLTK tagger and searches only for words with the same POS.
+eg: synonymous with permit (v) and rhymes with "hate" --> "tolerate"
+     synonymous with permit (n) and rhymes with "hate" --> ∅"""
 
 import nltk
 from collections import defaultdict
@@ -27,7 +29,7 @@ import re #regular expressions
 #synonym corpus
 from nltk.corpus import wordnet as wn
 
-#pronunciation corpus
+#pronunciation corpus from CMU Pronouncing Dictionary
 entries = nltk.corpus.cmudict.entries()
 
 #turn pronunciation corpus into a dictionary
@@ -83,8 +85,8 @@ def check_pos(tagged_word):
 
 def tagged_thesaurus(tagged_word):
     """returns synonyms of a word of the same POS
-    tagged_thesaurus("slow", "v") --> [u'decelerate', u'slow', u'slow_down', ... ]
-    tagged_thesaurus("slow", "a") --> [u'slow', u'dense', u'dim', u'dull', ...]"""
+    tagged_thesaurus(('slow', 'VBN')) --> [u'decelerate', u'slow', u'slow_down', ... ]
+    tagged_thesaurus(('slow', 'JJ')) --> [u'slow', u'dense', u'dim', u'dull', ...]"""
     synonym_list = []
     word = tagged_word[0].lower()
     pos = check_pos(tagged_word)
@@ -96,9 +98,9 @@ def tagged_thesaurus(tagged_word):
             synonym_set = meaning.lemma_names()
             [synonym_list.append(syn) for syn in synonym_set if syn not in synonym_list]
             #also evalutes nouns as adjectives because nltk tagger has a bad habit of mis-tagging
-        elif pos == "n" and syn_pos == "a":
-            synonym_set = meaning.lemma_names()
-            [synonym_list.append(syn) for syn in synonym_set if syn not in synonym_list]
+        #elif pos == "n" and syn_pos == "a":
+#            synonym_set = meaning.lemma_names()
+#            [synonym_list.append(syn) for syn in synonym_set if syn not in synonym_list]
     return synonym_list
 
 ###
@@ -143,6 +145,8 @@ def full_find(text):
     for rhyme in split_text:
         all_words += find(rhyme, text)
     return all_words
+
+###
 
 def suggestions(text):
     """Formats an easily-readable output
