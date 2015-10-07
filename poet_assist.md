@@ -14,12 +14,12 @@ while also being synonymous with another word in it {S:S⊂T},
 output by the function full_find as a list of tuples in the format (R, S, [W1, W2, ... Wn]).
 
 For words with multiple possible pronunciations, this searches through all pronunciations.
-eg: synonymous with "sturdy" and rhymes with "route" --> "stout"
+eg:  synonymous with "sturdy" and rhymes with "route" --> "stout"
      synonymous with "shrewd" and rhymes with "route" --> "astute"
 
 Additionally, for words with multiple possible POS,
 this applies the NLTK tagger and searches only for words with the same POS.
-eg: synonymous with permit (v) and rhymes with "hate" --> "tolerate"
+eg:  synonymous with permit (v) and rhymes with "hate" --> "tolerate"
      synonymous with permit (n) and rhymes with "hate" --> ∅"""
 
 import nltk
