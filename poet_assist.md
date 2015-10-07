@@ -63,8 +63,7 @@ def rime(word):
 def tag(sent):
     """tags POS
     tag("Did you record that record?") -->
-    [('Did', 'NNP'), ('you', 'PRP'), ('record', 'VB'), ('that', 'DT'), ('record', 'NN'), ('?', '.')]
-    However, tagger tends to tag initial adjectives as nouns for some reason."""
+    [('did', 'VBD'), ('you', 'PRP'), ('record', 'VB'), ('that', 'DT'), ('record', 'NN'), ('?', '.')]"""
     sent = nltk.word_tokenize(sent.lower())
     sent_tagged = nltk.pos_tag(sent)
     return sent_tagged
@@ -124,7 +123,7 @@ def tagged_rhyme_and_relate(rhyme, tagged_relate):
 ###
 
 def find(rhyme, text):
-    """searches a given text for words that have synonyms rhyming with a given word
+    """searches a given text for words that have synonyms rhyming with a given word, returning a list of tuples
      find("head", "The sun was crimson.") --> [('head', 'crimson', [u'red'])]"""
     text = tag(text)
     words = []
@@ -140,7 +139,7 @@ def full_find(text):
     full_find("Upon his head, every hair was crimson.") --> ('head', 'crimson', [u'red'])  *among others"""
     split_text = re.split(" ", text) #splits into words.
     split_text = [word.strip(r"!?\"\',.") for word in split_text] #removes basic punctuation
-    all_words = [] 
+    all_words = []
     for rhyme in split_text:
         all_words += find(rhyme, text)
     return all_words
