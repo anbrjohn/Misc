@@ -6,7 +6,7 @@ The electoral college makes everyone focus on "red states" and "blue states", bu
 
 (Data sources are attriburted in the code)
 
-The plot above shows the percentage of votes in a county for the Republicans (red) vs. Democrats (blue). A polynomial regression line is fit to the data to highlight the general pattern; namely, that for an average US county, roughly two-thirds of the votes go to the GOP for cities of populations up to 100,000. However, after around 1,000,000 people, they tend to rapidly become Democrat-majority. 
+The plot above shows the percentage of votes in a county for the Republicans (red) vs. Democrats (blue). A polynomial regression line is fit to the data to highlight the general pattern; namely, that for an average US county, roughly two-thirds of the votes go to the GOP for counties of populations up to 100,000. However, after around 1,000,000 people, they tend to rapidly become Democrat-majority. 
 However, the graph clearly shows some outliers. Below are the top-20 most unexpected counties for each party, given this model.
 
 **Top 20 unexpectedly pro-GOP counties:**
@@ -63,6 +63,6 @@ However, the graph clearly shows some outliers. Below are the top-20 most unexpe
 ###Observations:###
 In general, an outlier is a county with a very large population that still had a large GOP voting base or a small county that had a relatively large Democrat vote. It's worth noting that this model still suggests that there should be around one-third of the vote for the Democrats even in the smallest of counties. That is why very small counties like Roberts County, TX still made the list if they had well below this level.
 
-Interestingly, many of the unexpected counties for both parties are from Texas. This suggests that some factor(s) other than population is affecting voting patterns there. Also, this model is probably overly simplified, especially the 2nd-order regression line.
+Interestingly, many of the unexpected counties for both parties are from Texas. This suggests that some factor(s) other than population is affecting voting patterns there. Also, this model is probably overly simplified, especially the quadratic regression.
 
 Additionally, although the "deep south" is associated with being very conservative politically, multiple small counties in Alabama and Mississippi made the list for voting unexpectedly Democrat. Other regions such as the Rockies and the Midwest, which also have many small-population counties, nevertheless strayed less from the norm than these. This dichotomy is likely due to demographic differences.
