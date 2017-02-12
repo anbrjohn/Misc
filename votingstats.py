@@ -74,12 +74,12 @@ dem_diff = sorted(data, key=lambda x:x[-1])
 print("Top 20 unexpectedly pro-GOP counties:")
 for i in range(20):
     county = gop_diff[i]
-    print('{}, {}\t Population:{} \tPercent for GOP: {}%'.format(county[3], 
+    print('{}, {}\t Population: {} \tPercent for GOP: {}%'.format(county[3], 
           county[4], "{:,}".format(county[0]), round(county[1]*100, 2)))
 print("\n")
 
 print("Top 20 unexpectedly pro-DEM counties:")
 for i in range(20):
     county = dem_diff[i]
-    print('{}, {}\t Population:{} \tPercent for GOP: {}%'.format(county[3], 
+    print('{}, {}\t Population: {} \tPercent for DEM: {}%'.format(county[3], 
           county[4], "{:,}".format(county[0]), round(county[2]*100, 2)))
