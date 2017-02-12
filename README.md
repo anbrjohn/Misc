@@ -63,4 +63,4 @@ However, the graph clearly shows some outliers. Below are the top-20 most unexpe
 ###Observations:###
 In general, an outlier is a county with a very large population that still had a large GOP voting base or a small county that had a relatively large Democrat vote. It's worth noting that this model still suggests that there should be around one-third of the vote for the Democrats even in the smallest of counties. That is why very small counties like Roberts County, TX still made the list if they had well below this level.
 
-Interestingly, many of the unexpected counties for both parties are from Texas. This suggests that some factor(s) other than population is affecting voting patterns.
+Interestingly, many of the unexpected counties for both parties are from Texas. This suggests that some factor(s) other than population is affecting voting patterns. Also, this model is probably overly simplified, especially the 2nd-order regression line.
