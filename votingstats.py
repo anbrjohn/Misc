@@ -9,7 +9,7 @@ import numpy as np
 
 # 2016 County-Level Election Data from:
 # https://github.com/tonmcg/County_Level_Election_Results_12-16/blob/master/2016_US_County_Level_Presidential_Results.csv
-with open("2016counties.txt") as f:
+with open("counties.txt") as f:
     voting = f.readlines()
     voting = voting[1:]
 voting = [x.split(",") for x in voting]
