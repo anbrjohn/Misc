@@ -1,8 +1,10 @@
 ###Playing around with votings statistics from the 2016 US presidential eleciton###
 
-The electoral college makes everyone focus on "red states" and "blue states", but I was curious what patterns emerged at the county level. Specifically, I wanted to test the urban-rural divide narrative by seeing how the population of a county correlated to voting patterns. (Data sources are attriburted in the code)
+The electoral college makes everyone focus on "red states" and "blue states", but I was curious what patterns emerged at the county level. Specifically, I wanted to test the urban-rural divide narrative by seeing how the population of a county correlated with voting patterns.
 
 ![My image](https://github.com/anbrjohn/Misc/blob/master/votingresults.png)
+
+(Data sources are attriburted in the code)
 
 The plot above shows the percentage of votes in a county for the Republicans (red) vs. Democrats (blue). A polynomial regression line is fit to the data to highlight the general pattern; namely, that for an average US county, roughly two-thirds of the votes go to the GOP for cities of populations up to 100,000. However, after around 1,000,000 people, they tend to rapidly become Democrat-majority. 
 However, the graph clearly shows some outliers. Below are the top-20 most unexpected counties for each party, given this model.
