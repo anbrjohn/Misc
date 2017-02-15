@@ -66,3 +66,7 @@ In general, an outlier is a county with a very large population that still had a
 Additionally, although the "deep south" is associated with being very conservative politically, multiple small counties in Alabama and Mississippi made the list for voting unexpectedly Democrat. Other regions such as the Rockies and the Midwest, which also have many small-population counties, nevertheless strayed less from the norm than these. This dichotomy is likely due to demographic differences.
 
 Interestingly, many of the unexpected counties for both parties are from Texas. This suggests that some factor(s) other than population is affecting voting patterns there. Also, this model is probably overly simplified, especially the quadratic regression.
+
+![My image](https://github.com/anbrjohn/Misc/blob/master/newmap.png)
+
+I also generated a heatmap in makemap.py. Note again that the colors correspond to unexpected voting patterns given the population of the county, not the actual outcome. Compared to this map https://en.wikipedia.org/wiki/United_States_presidential_election,_2016#/media/File:United_States_presidential_election_results_by_county,_2016.svg there are many similar patterns but some differences. For example, boroughs in Alaska that voted majority Republican should have voted by an even larger margin given this model, so they show up as blue on this map. The same is true in reverse for the tip of Florida, which voted majority Democrat, but not my as large as margin as expected.
