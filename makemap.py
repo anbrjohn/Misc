@@ -6,7 +6,7 @@
 
 """
 Given dem_diff list from votingstats.py,
-creates a heap map (svg) of US counties,
+creates a heap map (svg) of US counties
 """
 
 from bs4 import BeautifulSoup
