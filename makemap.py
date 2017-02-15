@@ -27,6 +27,7 @@ for county in dem_diff:
     cat_dict[county[-4]] = county[-1]
 
 # Open blank US county map
+# From: https://commons.wikimedia.org/wiki/File:USA_Counties_with_FIPS_and_names.svg
 with open('USA_Counties.svg', 'r') as f:
     us_map = f.read()
 soup = BeautifulSoup(us_map, selfClosingTags=['defs','sodipodi:namedview'])
