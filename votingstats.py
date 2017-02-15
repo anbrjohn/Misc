@@ -32,17 +32,20 @@ for county in pop:
         pass
 
 data = list(voting.values())
-data = [x[::-1] for x in data if len(x)==5]
-data.sort()
+for i in range(len(voting.keys())):
+    data[i].append(list(voting.keys())[i])
+    
+data = [x for x in data if len(x) == 6] # One entry lacks population data
+data = sorted(data, key=lambda x:x[-2]) # Sort by population
+# Reminder: [State, County, DEM%, GOP%, Population, FIPS]
 
-population = [x[0] for x in data]
-gop = [x[1] for x in data]
+population = [x[-2] for x in data]
+gop = [x[3] for x in data]
 dem = [x[2] for x in data]
 
 # Plot county points
 plt.plot(population,dem, "bo")
 plt.plot(population,gop, "ro")
-plt.xscale('log')
 
 # Calculate and plot 2nd order polynomial regression curve
 x_line = population[:-2]
@@ -61,25 +64,26 @@ plt.show()
 
 # Figure out the counties that diverge most from the regression curve's prediction
 for county in data:
-    population = county[0]
-    gop = county[1]
+    population = county[-2]
     dem = county[2]
-    gop_diff = gop_func(population) - gop
+    gop = county[3]
     dem_diff = dem_func(population) - dem
-    county.append(gop_diff)
+    gop_diff = gop_func(population) - gop
     county.append(dem_diff)
-gop_diff = sorted(data, key=lambda x:x[-2])
-dem_diff = sorted(data, key=lambda x:x[-1])
+    county.append(gop_diff)
+dem_diff = sorted(data, key=lambda x:x[-2])
+gop_diff = sorted(data, key=lambda x:x[-1])
+# Reminder: [State, County, DEM%, GOP%, Population, FIPS, DEM diff, GOP diff]
 
 print("Top 20 unexpectedly pro-GOP counties:")
 for i in range(20):
     county = gop_diff[i]
-    print('{}, {}\t Population: {} \tPercent for GOP: {}%'.format(county[3], 
-          county[4], "{:,}".format(county[0]), round(county[1]*100, 2)))
+    print('{}, {}\t Population: {} \tPercent for GOP: {}%'.format(county[1], 
+          county[0], "{:,}".format(county[4]), round(county[3]*100, 2)))
 print("\n")
 
 print("Top 20 unexpectedly pro-DEM counties:")
 for i in range(20):
     county = dem_diff[i]
-    print('{}, {}\t Population: {} \tPercent for DEM: {}%'.format(county[3], 
-          county[4], "{:,}".format(county[0]), round(county[2]*100, 2)))
+    print('{}, {}\t Population: {} \tPercent for DEM: {}%'.format(county[1], 
+          county[0], "{:,}".format(county[4]), round(county[2]*100, 2)))
