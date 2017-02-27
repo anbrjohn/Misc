@@ -22,7 +22,7 @@ for i in range(len(dem_diff)):
         if category > cat:
             category = cat
 
-cat_dict = {} # {FIPS : catagory]
+cat_dict = {} # {FIPS : category}
 for county in dem_diff:
     cat_dict[county[-4]] = county[-1]
 
