@@ -21,11 +21,8 @@ def get_xy(data, seqlen=4):
         x_data = np.array(data[i:i+seqlen])
         x_data = x_data.flatten()
         dataX.append(x_data)
-        ##dataY.append(np.array(data[i+seqlen]))
         dataY.append(data[i+seqlen])
-    #y = to_categorical(dataY) #Convert to one-hot encoding
     x = np.reshape(dataX, (len(dataX), seqlen*length, 1))
-    #x = x/len(char_dict) #NN prefers floats
     dataY[-1] = dataY[-2][:] #Last element was empty and had wrong length
     y = np.array(dataY)
     return x, y
@@ -45,7 +42,6 @@ model.fit(x,y, batch_size=16, nb_epoch=1, verbose=1)
 
 def more_process(prediction):
     lis = prediction.tolist()
-    #lis = prediction.flatten().tolist()
     for entry in lis:
         entry[0] *= 480 # Duration
         entry[1] *= 89 # Note pitch
