@@ -12,7 +12,7 @@ Very much a work-in-progress. Lots of Frankencode. Beware!
 
 ###Structure of midi files:
 
-I use this [delightful program](http://www.fourmilab.ch/webtools/midicsv/) to easily convert midi files into readable csv files. 
+Instead of directly encoding an audio signal, midi files act as an electronic musical score, with information on volume, pitch, and timing for different tracks. I use this [delightful program](http://www.fourmilab.ch/webtools/midicsv/) to easily convert midi files into human-readable csv files. 
 
 eg: `$ midicsv chorale.mid > chorale.csv`
 
@@ -21,7 +21,7 @@ The meat of the file consists of lines like this:
 ```
 2, 120, Note_on_c,  0, 67, 64
 2, 180, Note_off_c, 0, 67, 44
-2, 180, Note_on_c,  0, 72, 64
+2, 180, Note_on_c,  1, 72, 64
 [Track Number, timestamp, command, instrument number, pitch, volume]
 ```
 
@@ -34,7 +34,7 @@ Currently, I process these into the following format:
 [One-hot track number, normalized delta time, relative pitch, boolean on/off]
 ```
 
-I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks.
+I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks (64 files).
 
 I used a NN with 100-node LSTM and 2 more hidden layers of 100-nodes each.
 
