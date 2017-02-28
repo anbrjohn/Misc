@@ -24,7 +24,7 @@ The meat of the file consists of lines like this:
 2, 120, Note_on_c, 0, 67, 64
 2, 180, Note_off_c, 0, 67, 44
 2, 180, Note_on_c, 0, 72, 64
-[Track Number, timestamp, command, instrument Number, pitch, volume]
+[Track Number, timestamp, command, instrument number, pitch, volume]
 ```
 
 Currently, I process these into the following format:
