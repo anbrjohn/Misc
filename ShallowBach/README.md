@@ -1,10 +1,10 @@
-Inspiration Taken from the DeepBach Project:
-- https://www.youtube.com/watch?v=QiBM7-5hA6o
-- https://arxiv.org/pdf/1612.01010.pdf
-
 ###Goal:
 
 Automatically generate music in the style of J.S. Bach. Specifically, train a neural network on midi files of Bach works.
+
+Inspiration Taken from the DeepBach Project:
+- https://www.youtube.com/watch?v=QiBM7-5hA6o
+- https://arxiv.org/pdf/1612.01010.pdf
 
 ###Status:
 
