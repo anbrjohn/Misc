@@ -14,7 +14,7 @@ Very much a work-in-progress. Lots of Frankencode. Beware!
 
 I use this [delightful program](http://www.fourmilab.ch/webtools/midicsv/) to easily convert midi files into readable csv files. 
 
-eg: `$ csvmidi chorale.mid > chorale.csv`
+eg: `$ midicsv chorale.mid > chorale.csv`
 
 The meat of the file consists of lines like this:
 
