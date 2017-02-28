@@ -38,7 +38,7 @@ I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bac
 
 I used a NN with 100-node LSTM and 2 more hidden layers of 100-nodes each.
 
-After just one epoch of training, the good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even seems to have some rhythm and chords, which I think is very promising! Still, it is a far cry from a fugue. More like a cell phone ringtone... There is a long way to go.
+After just one epoch of training, the good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even seems to have somewhat complex rhythm and chords (perfect fourths), which I think is very promising! Still, it is a far cry from a fugue. More like a cell phone ringtone... There is a long way to go.
 
 *Listen [here](https://soundcloud.com/user-758753778/1epoch)!* Converted to standard notation, this is what the model produced:
 
