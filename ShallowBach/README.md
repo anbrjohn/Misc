@@ -21,7 +21,7 @@ The meat of the file consists of lines like this:
 ```
 2, 120, Note_on_c,  0, 67, 64
 2, 180, Note_off_c, 0, 67, 44
-2, 180, Note_on_c,  1, 72, 64
+3, 180, Note_on_c,  3, 72, 64
 [Track Number, timestamp, command, instrument number, pitch, volume]
 ```
 
@@ -30,7 +30,7 @@ Currently, I process these into the following format:
 ```
 [0, 1, 0], 0.00, 0, 1
 [0, 1, 0], 0.25, 0, 0
-[0, 1, 0], 0.00, 5, 1
+[0, 0, 1], 0.00, 5, 1
 [One-hot track number, normalized delta time, relative pitch, boolean on/off]
 ```
 
