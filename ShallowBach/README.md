@@ -49,6 +49,6 @@ After just one epoch of training, the good news is that its output is well-forma
 Maybe training this model longer will give better results, but I think there are other things I should tackle first:
 - More data. Don't limit myself to just songs with 4 tracks.
 - More/different pre-processing. Is this the best way to organize the data to train the network? I don't mean anything computationally expensive, just something I need to think out a bit more and put into code.
-- Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot nodes. Perhaps I could encode delta pitch for different timesteps...
+- Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the output, equivalent to the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot of nodes. Perhaps I could encode delta pitch for different timesteps...
 - Conversely, I am not convinced that I like my current one-hot track encoding system. It seems more intuitive to me to feed the pitch and volume (0 or 1) for each voice into the system simulateously.
 - To do so, I would need to rework how I model duration. If only one track is playing at a certain timestamp, I would feed null values for the other ones. I'm unsure whether this would help or hurt performance.
