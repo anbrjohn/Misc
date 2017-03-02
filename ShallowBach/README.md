@@ -46,7 +46,20 @@ As a proof of concept, I trained this model for just one epoch. The good news is
 
 Maybe training this model longer will give better results, but I think there are other things I should tackle first:
 - More data. Don't limit myself to just songs with 4 tracks.
-- More/different pre-processing. Is this the best way to organize the data to train the network? I don't mean anything computationally expensive, just something I need to think out a bit more and put into code.
-- Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the output, equivalent to the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot of nodes. Perhaps I could encode delta pitch for different timesteps...
-- Conversely, I am not convinced that I like my current one-hot track encoding system. It seems more intuitive to me to feed the pitch (and somehow encode volume (0 or 1) in that) for each voice into the system simulateously.
+- My gut tells me I should format the data differently:
+- Tracks: Instead of passing one track at a time with the track number encoded each time, I think it makes more sence to pass all tracks at once (with null values if a track isn't playing anything at that point). I haven't done this yet because it would require bit more coding in the processing module.
+- Pitch: Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the output, equivalent to the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot of nodes. Perhaps I could encode delta pitch for different timesteps...
+- Duration: If I made the above changes, I think it would be more tractable to go back to a timestep-based setup as opposed to delta time, though this 
 - To do so, I would need to rework how I model duration. If only one track is playing at a certain timestamp, I would feed null values for the other ones. I'm unsure whether this would help or hurt performance.
+- Idea:
+
+```
+120:
+67
+0
+
+180:
+0
+72
+[Timestamp (for example, not actually fed into model) / Track 1 / Track 2]
+```
