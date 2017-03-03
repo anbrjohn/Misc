@@ -37,6 +37,8 @@ Currently, I process these into the following format:
 ```
 
 Note that I don't bother keeping information on the instrumentation or exact volume. Relativizing the pitch is an approximate way to transpose pieces written in different keys together, so this network can more easily learn common patterns. However, this approach technically doesn't transpose everything into the same key if we consider pieces that don't begin on the tonic. ([reddit](https://www.reddit.com/r/musictheory/comments/2pv3a7/why_arent_everyone_starting_songs_with_tonics/): "If you want to be a basic bitch you start with the tonic"). My expectation (hope) is that this will not be an issue.
+
+###My Model:
 I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks (64 files). I used a NN with 100-node LSTM and 2 more hidden layers of 100-nodes each.
 
 As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even has chords and a somewhat complex rhythm, which I think is very promising! It's odd to me that the chords are perfect fourths, which were considered dissonant in the time of Bach. At any rate, it is a far cry from a fugue. More like a cell phone ringtone... **There is a long way to go.**
