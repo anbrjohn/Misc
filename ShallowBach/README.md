@@ -51,10 +51,9 @@ Maybe training this model longer will give better results, but I think there are
 - More data. Don't limit myself to just songs with 4 tracks.
 - My gut tells me I should format the data differently:
 - Tracks: Instead of passing one track at a time with the track number encoded each time, I think it makes more sence to pass all tracks at once (with null values if a track isn't playing anything at that point). I haven't done this yet because it would require bit more coding in the processing module.
-- Pitch: Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the output, equivalent to the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot of nodes. Perhaps I could encode delta pitch for different timesteps...
-- Duration: If I made the above changes, I think it would be more tractable to go back to a timestep-based setup as opposed to delta time, though this 
-- To do so, I would need to rework how I model duration. If only one track is playing at a certain timestamp, I would feed null values for the other ones. I'm unsure whether this would help or hurt performance.
-- Idea:
+- Pitch: Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the output, equivalent to the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot of nodes. I want to toy around with encoding this as delta pitch for different timesteps to see if that is more compact.
+- Duration: If I made the above changes, I think it would be more tractable to go back to a timestep-based setup as opposed to delta time, though to do so, I would need to rework how I model duration. If only one track is playing at a certain timestamp, I would feed null values for the other ones. I'm unsure whether this would help or hurt performance.
+- General idea:
 
 ```
 120:
