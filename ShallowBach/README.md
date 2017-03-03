@@ -9,6 +9,7 @@ Inspiration Taken from the DeepBach Project:
 ###Status:
 
 Very much a work-in-progress. Lots of Frankencode. Beware!
+I hope to steadily chip away at it whenever I get tired of the homework that I actually should be doing.
 
 ###Structure of midi files:
 
