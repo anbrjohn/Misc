@@ -34,9 +34,10 @@ Currently, I process these into the following format:
 [One-hot track number, normalized delta time, relative pitch, boolean on/off]
 ```
 
+Relativizing the pitch is an approximate way to transpose pieces in different keys to be the same. However, this technically doesn't achieve that if a piece doesn't begin on the tonic. ([reddit](https://www.reddit.com/r/musictheory/comments/2pv3a7/why_arent_everyone_starting_songs_with_tonics/): "If you want to be a basic bitch you start with the tonic") 
 I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks (64 files). I used a NN with 100-node LSTM and 2 more hidden layers of 100-nodes each.
 
-As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even seems to have somewhat complex rhythm and chords (perfect fourths), which I think is very promising! Still, it is a far cry from a fugue. More like a cell phone ringtone... **There is a long way to go.**
+As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even seems to have somewhat complex rhythm and chords, which I think is very promising! It's odd to me that the chords are perfect fourths, which were considered dissonant in the time of Bach. At any rate, it is a far cry from a fugue. More like a cell phone ringtone... **There is a long way to go.**
 
 *Listen [here](https://soundcloud.com/user-758753778/1epoch)!* Converted to standard notation, this is what the model produced:
 
