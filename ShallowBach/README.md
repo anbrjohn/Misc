@@ -8,8 +8,9 @@ Inspiration Taken from the DeepBach Project:
 
 ###Status:
 
-Very much a work-in-progress. Lots of Frankencode. Beware!
+Very much a work-in-progress.
 I hope to steadily chip away at it whenever I get tired of the homework that I actually should be doing.
+Lots of Frankencode. Beware!
 
 ###Structure of midi files:
 
