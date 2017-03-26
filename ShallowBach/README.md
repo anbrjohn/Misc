@@ -7,6 +7,11 @@ Inspiration Taken from the DeepBach Project:
 - https://www.youtube.com/watch?v=QiBM7-5hA6o
 - https://arxiv.org/pdf/1612.01010.pdf
 
+And from other similar projects:
+- http://bachbot.com/#/?_k=evep3j
+- http://www.hexahedria.com/2015/08/03/composing-music-with-recurrent-neural-networks/
+
+
 Status:
 -----
 
@@ -33,43 +38,26 @@ The meat of the file consists of lines like this:
 Currently, I process these into the following format:
 
 ```
-[0, 1, 0], 0.00, 0, 1
-[0, 1, 0], 0.25, 0, 0
-[0, 0, 1], 0.00, 5, 1
-[One-hot track number, normalized delta time, relative pitch, boolean on/off]
+array([[ 50.,   0.,   0.,   0.],
+       [ 50.,   0.,   0.,   0.],
+       [ 50.,   0.,  38.,  38.],
+       [ 50.,   0.,  41.,  38.]])
 ```
 
-Note that I don't bother keeping information on the instrumentation or exact volume. Relativizing the pitch is an approximate way to transpose pieces written in different keys together, so this network can more easily learn common patterns. However, this approach technically doesn't transpose everything into the same key if we consider pieces that don't begin on the tonic. ([reddit](https://www.reddit.com/r/musictheory/comments/2pv3a7/why_arent_everyone_starting_songs_with_tonics/): "If you want to be a basic bitch you start with the tonic"). My expectation (hope) is that this will not be an issue.
+Each row represents a time step. During processing, the "granularity" can be adjusted. For example, having one row for every 16th note versus one for every 64th note. Too high and the data grows in size. Too low and I risk not capturing details like trills, tuplets, ...). Each column represents a different track. The value inside corresponds to the note value (more on this in  bit), with zero representing no note (silence). Note that I don't bother keeping information on the instrumentation or exact volume. I relativize the pitch as an approximate way to transpose pieces written in different keys together, so this network can more easily learn common patterns. However, this approach technically doesn't transpose everything into the same key if we consider pieces that don't begin on the tonic. (To quote [reddit](https://www.reddit.com/r/musictheory/comments/2pv3a7/why_arent_everyone_starting_songs_with_tonics/): "If you want to be a basic bitch you start with the tonic"). My expectation (hope) is that this will not be an issue.
 
 My Model:
 -----
 
-I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks (64 files). I used a NN with 100-node LSTM and 2 more hidden layers of 100-nodes each.
+I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks or fewer (5 tracks total becaise the first track never is always just metadata like speed and volume changes, which I ignore). This is the majority of the files. For files with fewer than 4 tracks, I currently just return silence for the other tracks. I used a NN with 2 LSTM laters of 100-nodes each with 0.2 percent dropout, one more hidden layer of 100-nodes, and an activation layer.
 
-As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even has chords and a somewhat complex rhythm, which I think is very promising! It's odd to me that the chords are perfect fourths, which were considered dissonant in the time of Bach. At any rate, it is a far cry from a fugue. More like a cell phone ringtone... **There is a long way to go.**
+I debated how to best organize my data and tried various approaches. I believe that converting all the input training data (with a sequence length of 3) to one-hot encoding for each track and doing the same for the output training data would lead to the best results, but it takes much, much longer to train. I toyed around with "4hot" encoding, where each track it marked with a 1 in a vector that represents every possible note and silence (around 100), but that doesn't capture which voice is responsible for which note, nor does it distinguish when multiple voices are playing the same note.
 
-*Listen [here](https://soundcloud.com/user-758753778/1epoch)!* Converted to standard notation, this is what the model produced:
+I settled with dividing the input data as is by 100 to feed the network floats in the range [0.0, 1.0). I didn't like the idea of a minor change in value (eg. 0.56 to 0.57) potentially meaning the difference between a well-formed chord and dissonance, but this was my compromise. I did, however, convert the output (y) training data into a one-hot vector for each track. When generating a new file, it then uses the predict function and samples from the probability distribution (restricted to the top-n) for some variety.
+
+As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even has chords and a somewhat complex rhythm in which the voices play well together, which I think is very promising! Still, it is a far cry from a fugue. When I have some time, I will train it longer and see what I get.
+
+*Listen [here](https://soundcloud.com/user-758753778/1epochs)!* Converted to standard notation, this is what the model produced:
 
 ![My image](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1epoch.png)
 
-Thoughts:
------
-
-Maybe training this model longer will give better results, but I think there are other things I should tackle first:
-- More data. Don't limit myself to just songs with 4 tracks.
-- My gut tells me I should format the data differently:
-- Tracks: Instead of passing one track at a time with the track number encoded each time, I think it makes more sence to pass all tracks at once (with null values if a track isn't playing anything at that point). I haven't done this yet because it would require bit more coding in the processing module.
-- Pitch: Instead of returning a float for the pitch, I think it might be better to encode the notes as a one-hot vector. Then instead of just taking the output, equivalent to the argmax, I could sample from the probability ditribution for more variety. However, that adds a lot of nodes. I want to toy around with encoding this as delta pitch for different timesteps to see if that is more compact.
-- Duration: If I made the above changes, I think it would be more tractable to go back to a timestep-based setup as opposed to delta time, though to do so, I would need to rework how I model duration. If only one track is playing at a certain timestamp, I would feed null values for the other ones. I'm unsure whether this would help or hurt performance.
-- General idea:
-
-```
-120:
-67
-0
-
-180:
-0
-72
-[Timestamp (for example, not actually fed into model) / Track 1 / Track 2]
-```
