@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import keras
 from keras.models import Sequential
@@ -12,8 +11,9 @@ import pylab
 import random
 
 
-def get_xy(data, seqlen=4):
-    """Prepare data"""
+def get_xy(data, seqlen=3, y_type="float"):
+    """Prepare data. y_type can be float, 1-hot, or 4-hot"""
+    voices = 4
     dataX = [] # Represenation of consecutive notes (of length seqlen)
     dataY = [] # Representation of the following notes
     length = len(data[0]) # Number of features for each element
@@ -23,98 +23,135 @@ def get_xy(data, seqlen=4):
         dataX.append(x_data)
         dataY.append(data[i+seqlen])
     x = np.reshape(dataX, (len(dataX), seqlen*length, 1))
+    x = x/100 #NN prefers floats
     dataY[-1] = dataY[-2][:] #Last element was empty and had wrong length
     y = np.array(dataY)
+    
+    y_type = str(y_type)[0].lower()
+    if y_type == "f":
+        y /= 100
+    elif y_type == "1":
+        notes = int(max(np.array(data).flatten())) + 1
+        print("Notes:", notes) # Length of 1-hot vector for each voice
+        size = len(x)
+        all_lines = np.zeros([size, notes * voices])
+        for timestep in range(size):
+            # A 1-hot vector for each voice, concatenated together
+            concat_lines = np.array([])
+            for voice in y[timestep]:
+                line = np.zeros([notes])
+                line[int(voice)] = 1
+                concat_lines = np.hstack([concat_lines, line])
+            all_lines[timestep] = concat_lines
+        y = all_lines
+    elif y_type == "4":
+        y = to_categorical(y) #Convert to "four-hot" encoding
     return x, y
 
-x,y = get_xy(all_data2)
 
+x, y = get_xy(all_data, seqlen=3, y_type=4)
 
 model = Sequential()
-model.add(LSTM(100, input_shape=(x.shape[1], x.shape[2])))
+model.add(LSTM(100, return_sequences=True, input_shape=(x.shape[1], x.shape[2])))
 model.add(Dropout(0.2))
-model.add(Dense(100, activation="relu"))
+model.add(LSTM(100, return_sequences=False))
+model.add(Dropout(0.2))
 model.add(Dense(100, activation="relu"))
 model.add(Dense(y.shape[1], activation="softmax"))
 model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=['accuracy'])
 
-model.fit(x,y, batch_size=16, nb_epoch=1, verbose=1)
+model.fit(x,y, batch_size=32, nb_epoch=1, verbose=1)
 
-def more_process(prediction):
-    lis = prediction.tolist()
-    for entry in lis:
-        entry[0] *= 480 # Duration
-        entry[1] *= 89 # Note pitch
-        entry[0] = round(entry[0], 5)
-        entry[1] = round(entry[1], 5)
-        entry[2] = round(entry[2]) # Boolean on/off
-        one_hot = max(entry[-5:])
-        for i in range(5):
-            if entry[i-5] == one_hot:
-                #index = i-5
-                entry[i-5] = 1
-            else:
-                entry[i-5] = 0
-    prediction = np.array(lis).flatten()
-    prediction = np.array([prediction.tolist()]).T
-    return prediction
+#For 1-hot
+def get_notes(prediction, considered_notes=4):
+    note_values = []
+    for i in range(considered_notes):
+        note = np.argmax(prediction)
+        # Append pitch and probability
+        note_values.append((note, prediction[note]))
+        # Turn off so next-highest will now be returned
+        prediction[note] = 0
+    return note_values
 
-def consecutive(seed, iterations):
-    total = [seed]
+
+def guess_note(prediction):
+    note_values = []
+    noteprobs = get_notes(prediction)
+    prob_sum = sum([n[1] for n in noteprobs])
+    probs = [n[1]/prob_sum for n in noteprobs] # Normalize probabilities
+    notes = [n[0] for n in noteprobs]
+    guess = np.random.choice(notes, 1, p=probs)
+    guess = guess.tolist()
+    return guess[0]
+
+
+def consec3(seed, iterations):
+    voices = 4
+    s = seed * 100
+    s = s.T.tolist()[0]
+    # Only works if seqlen=3 !!
+    total = [s[:voices], s[voices:voices * 2], s[voices * 2:voices * 3]]
     next_seed = seed
     for i in range(iterations):
-        prediction = model.predict(next_seed)
-        prediction = more_process(prediction)
-        next_seed = seed.tolist()
-        next_seed = next_seed[1:]+[prediction.tolist()]
+        prediction = model.predict(np.array([next_seed]))
+        notes = int(len(prediction[0]) / voices)
+        new_line = np.zeros(voices)
+        for voice in range(voices):
+            voice_prediction = prediction[0][notes*voice:notes*(voice+1)]
+            guess = guess_note(voice_prediction)
+            new_line[voice] = guess
+        total.append(new_line.tolist())        
+        next_seed = next_seed[voices:].tolist()
+        for guess in new_line.tolist():
+            next_seed.append([guess/100])
         next_seed = np.array(next_seed)
-        total.append(next_seed)
-    return total
+    return np.array(total)
 
-def split(data):
-    separated = []
-    for entry in data:
-        for y in entry:
-            separated.append(y[:8])
-            separated.append(y[8:16])
-            separated.append(y[16:24])
-            separated.append(y[24:])
-    return separated
-
-def unprocess(prediction):
-    new = []
-    entry = prediction.flatten().tolist()
-    #new.append(int(entry[0] * 480)) # Duration
-    new.append(int(entry[0])) # Duration
-    pitch = int(entry[1] * 89)
-    new.append(pitch)
-    new.append(int(entry[2])) #Boolean on/off
-    if entry[3] == 1:
-        new.append(-1)
-    elif entry[4] == 1:
-        new.append(2)
-    elif entry[5] == 1:
-        new.append(3)
-    elif entry[6] == 1:
-        new.append(4)
-    elif entry[7] == 1:
-        new.append(5)
-    return new
-
-def compose(seed, iterations, save=False):
-    total = []
-    many = consecutive(seed, iterations)
-    for x in split(many):
-        unprocessed = unprocess(x)
-        if unprocessed[1] < 101:
-            total.append(unprocessed)
-    final = decode(total, 65, 5)
+def compose3(seed, iterations, save=False):
+    total = consec3(seed, iterations)
+    final = decode(total)
     if save:
         make_csv(str(save), final)
     print("Done")
-
-
-seed_start = 0
-seed = x[seed_start:seed_start+4]
-compose(seed,10,"1epoch.txt")
     
+
+
+def final_transpose(text, offset):
+    formatted = []
+    for line in text:
+        line = line.split(", ")
+        if line[2].lower() == "note_on_c" or line[2].lower() == "note_off_c":
+            line[4] = str(int(line[4]) + offset)       
+            formatted += [line]
+        else:
+            formatted += [line]
+    transposed = []
+    for line in formatted:
+        line = ", ".join(line)
+        transposed.append(line)
+    return transposed
+
+
+#To later convert into midi
+def make_csv2(filename, data): 
+    with open(filename, "w") as f:
+        for line in data:
+            f.write(line)
+    print("Saved as", filename)
+    
+def adjust(filename, pitch, speed, output_title):
+    with open(filename) as f:
+        text = f.readlines()
+    header = text[0].split()
+    header[5] = str(speed) + "\n"
+    header = " ".join(header)
+    text[0] = header
+    adjusted = final_transpose(text, pitch)
+    make_csv2(output_title, adjusted)
+    
+#adjust(filename, 30, 120, "4H10e.csv")
+
+seed = s2
+filename = "60e3.csv"
+compose3(seed, 240, save=filename)
+adjust(filename, 15, 240 , filename)
