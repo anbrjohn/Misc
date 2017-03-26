@@ -1,4 +1,9 @@
-#Steps to encode midi-csv format into one for NN
+
+import numpy as np
+
+
+gran = 32 # Granularity (smallest note duration captured)
+    
 def do_format(text):
     formatted = []
     for line in text:
@@ -10,142 +15,183 @@ def do_format(text):
     return formatted
 
 
-#Changes timestamp to relative durations
-def duration(text): #Formatted text
-    last = 0
-    for line in text:
-        diff = line[1] - int(last)
-        last = str(line[1])
-        line[1] = diff
-    return text
-
-
 #Makes note values relative to the first one
-def rel_note(text, start):###=start_note):
-    for line in text:
-        line[4] = str(int(line[4]) - start)
-    return text
-            
+def transpose(data, offset=40):
+    start = int(data[0][4]) - offset # Zero reserved for silence
+    for line in data:
+        line[4] = str(int(line[4]) - start)  
+    return data
 
-#Puts it in the desired format
-def organize(text, metronome):
+
+#Changes timestamp to relative durations
+def timing(data, metronome, granularity=gran): #Formatted text and smallest note represented (eg. 32nd)
+    last = 0
+    for line in data:
+        last = str(line[1])
+        line[1] = line[1] / metronome #Normalized (1.0 = one quarter note)
+        line[1] = round(line[1] * (np.log2(granularity) - 1), 0)
+    return data
+
+
+#Further organizes format, sets note_off command to pitch value of 0
+def trim(data):
     output = []
-    for line in text:
+    for line in data:
         voice = int(line[0])
-        duration = line[1] / metronome
+        timing = int(line[1])
         note = int(line[4])
         on_off = line[2]
         if on_off.lower() == "note_on_c":
-            #volume = int(line[5])
-            volume = 1 #Boolean volume system
+            note = int(line[4])
         else: #Note_off_c
-            volume = 0
-        output.append([duration, note, volume, voice])
-    end_marker = [0,0,0,-1] #Necessary?
-    output.append(end_marker)
+            note = 0
+        output.append([timing, voice, note])
+    output.sort()
     return output
 
 
-#Same as above steps but in reverse
-#To convert output of NN into midicsv format
-def un_organize(text, metronome=480):
-    new = []
-    for line in text:
-        duration = round(line[0] * metronome)
-        note = line[1]
-        volume = line[2]
-        voice = line[3]
-        if volume > 0:
-            new.append([voice, duration, "Note_on_c", "0", note, str(70)+"\n"]) #Boolean volume system
-        else:
-            new.append([voice, duration, "Note_off_c", "0", note, str(volume)+"\n"])
-    return new[:-1] #Remove end_marker (which was added for training purposes)
+def expand(data, number_of_voices):
+    voices = number_of_voices - 1
+    start = data[0][0]
+    stop = data[-1][0] 
+    data = data[::-1] # Reverse it for popping
+    # Initialize array: Incremental timesteps x voices
+    timesteps = np.zeros(((stop - start), voices))
+    all_voices = np.zeros(voices)
+    time, voice, pitch = data.pop()
+    for i in range(start, stop):
+        while time == i:
+            all_voices[voice - 2] = pitch
+            try:
+                time, voice, pitch = data.pop()
+            except: # If no data left to pop
+                time = "skip" # To break out of while loop
+        timesteps[i - start] = all_voices
+        # Buffer at end to help signal end of song
+    buffer = np.zeros((10, voices))
+    timesteps = np.vstack((timesteps, buffer))
+    return timesteps
 
 
-def un_note(text, start):
-    for line in text:
-        line[4] += start
-    return text
-
-
-def un_duration(text):
-    total = 0
-    for line in text:
-        line[1] += total
-        total = line[1]
-    return text
-
-
-def undo_format(text, number_of_voices, last_timestamp, metronome=480):
-    line1 = "0, 0, Header, 1, "+str(number_of_voices)+", "+str(metronome)+"\n"
-    line2 = "1, 0, Start_track\n"
-    line3 = "1, " + str(last_timestamp+5) + ", End_track\n"
-    line4 = "2, 0, Start_track\n"
-    formatted = [line1, line2, line3, line4]
-    text = sorted(text)
-    
-    last = 2
-    indecies = []
-    for i in range(len(text)):
-        voice = text[i][0]
-        if voice != last:
-            indecies += [i-3]
-            last = voice
-
-    for line in text:
-        line[0] = str(line[0])
-        line[1] = str(line[1])
-        line[4] = str(line[4])
-        line = ", ".join(line)
-        formatted += [line]
-    
-    # Add markers for start/stop of tracks
-    voice = 2
-    for point in indecies:
-        end = str(voice) + ", " + str(last_timestamp+5) + ", End_track\n"
-        voice += 1
-        start = str(voice) + ", 0, Start_track\n"
-        insert_point = point + (voice * 2) + 1
-        formatted.insert(insert_point, end)
-        formatted.insert(insert_point+1, start)
-    end = str(voice) + ", " + str(last_timestamp+5) + ", End_track\n"
-    formatted.append(end)
-    formatted.append("0, 0, End_of_file\n")
-    
-    return formatted
-
-
-#Putting all of the above together:
-def encode(filename, info=True):
+def encode(filename):    
     with open(filename) as f:
         text = f.readlines()
     header = text[0].split(", ")
     number_of_voices = int(header[4])
     metronome = int(header[5])
-    
     f1 = do_format(text)
-    f2 = duration(f1)
-    start_note = int(f2[0][4])
-    if info:
-        print("Number of voices", number_of_voices)
-        print("Start note:", start_note)
-    f3 = rel_note(f2, start_note)
-    f4 = organize(f3, metronome)
-    return f4
+    f2 = transpose(f1, offset=50)
+    f3 = timing(f2, metronome)
+    f4 = trim(f3)
+    f5 = expand(f4, number_of_voices)
+    return f5
 
-def decode(data, start_note, number_of_voices):
-    u4 = un_organize(data)
-    u3 = un_note(u4, start_note) #need to know start_note
-    u2 = un_duration(u3)
-    last_timestamp = u2[-1][1]
-    u1 = undo_format(u2, number_of_voices, last_timestamp)
+f = encode(filename)
+
+
+# Removes repeat information for timesteps
+def collapse(data):
+    data = data.T
+    change_log = []
+    voice_num = 2
+    for voice in data:
+        i = 0
+        # Find first note for a track that is not 0
+        while voice[i] == 0 and i < len(voice) - 1: 
+            i += 1
+        change_log.append((i, voice_num, voice[i])) #Timestep, voice, and note
+        for time in range(i, len(voice)):
+            note = round(voice[time])
+            # If current note is different than the last one
+            if note != change_log[-1][2]: 
+                change_log.append((time, voice_num, note))
+        voice_num += 1
+    return change_log
+
+    
+# Redoes some formatting and adds in note_off commands at pitch transitions
+def un_organize(data, metronome=480, granularity=gran):
+    time_factor = metronome / (np.log2(granularity) - 2)
+    new = []
+    prev_voice = 0
+    for time, voice, note in data:
+        time = time * time_factor
+        if note != 0:
+            command = 'Note_on_c'
+            volume = 70
+        else:
+            # Would be a problem if 1st note of a voice is 0
+            command = 'Note_off_c' 
+            volume = 0
+        # Add note_off command for previous pitch at current timestep
+        if prev_voice != voice: # If this is the first note of a new track
+            prev_voice = voice
+            prev_note = note
+        else:
+            off_line = [voice, int(time), 'Note_off_c', 0, int(prev_note), 0]
+            new.append(off_line)
+            
+        line = [voice, int(time), command, 0, int(note), volume]
+        new.append(line)
+        prev_note = note
+    return new
+    
+    
+def undo_format(data, metronome=480):
+    number_of_voices = data[-1][0]
+    last_timestep = max([x[1] for x in data]) + 2
+    line1 = "0, 0, Header, 1, "+str(number_of_voices)+", "+str(metronome)+"\n"
+    line2 = "1, 0, Start_track\n"
+    line3 = "1, " + str(last_timestep+5) + ", End_track\n"
+    line4 = "2, 0, Start_track\n"
+    formatted = [line1, line2, line3, line4]
+    data = sorted(data)
+    last = 2
+    indecies = []
+    for i in range(len(data)):
+        voice = data[i][0]
+        if voice != last:
+            indecies += [i-3]
+            last = voice
+    for line in data:
+        line[0] = str(line[0]) # Voice
+        line[1] = str(line[1]) # Time
+        line[3] = str(line[3]) # Instrument
+        line[4] = str(line[4]) # Note
+        line[5] = str(line[5]) # Volume
+        line = ", ".join(line)
+        formatted += [line + "\n"]
+    # Add markers for start/stop of tracks
+    voice = 2
+    for point in indecies:
+        end = str(voice) + ", " + str(last_timestep) + ", End_track\n"
+        voice += 1
+        start = str(voice) + ", 0, Start_track\n"
+        insert_point = point + (voice * 2) + 1
+        formatted.insert(insert_point, end)
+        formatted.insert(insert_point+1, start)
+    end = str(voice) + ", " + str(last_timestep) + ", End_track\n"
+    formatted.append(end)
+    formatted.append("0, 0, End_of_file\n")
+    return formatted
+
+
+def decode(data):
+    u3 = collapse(data)
+    u2 = un_organize(u3)
+    u1 = undo_format(u2)    
     return u1
 
-def make_csv(filename, data): #Save the file
+#To later convert into midi
+def make_csv(filename, data): 
     with open(filename, "w") as f:
         for line in data:
             f.write(line)
     print("Saved as", filename)
+    
+u = decode(f)
+
+
 
 
 
@@ -159,25 +205,51 @@ def encode_multiple(filenames):
     return all_data
 
 
-def process(data, info=True, voice_num=4):
-    #durations = len(set([x[0] for x in all_data]))
-    notes = len(set([x[1] for x in all_data]))
-    for line in data:
-        #line[0] /= durations
-        line[1] /= notes
-        voice = str(line[3])
-        if voice == -1: #End of song case
-            voice = 1 #Other voices begin with 2. Makes them consecutive.
-        for i in range(voice_num):
-            line.append(0)
-        line[3] = 0
-        line[2+int(voice)] = 1
-    if info:
-        #print("Duration normalizer:", durations)
-        print("Notes normalizer:", notes)
-    return data
-all_data = encode_multiple(filenames)
-all_data = process(all_data)
+import os
+midis = [file for file in os.listdir() if file[-4:] == ".txt"]
+
+#Go over all midi files in a folder
+
+info = []
+for file in midis:
+    with open(file) as f:
+        try:
+            text = f.readlines()
+            line = text[0]
+            line = line.split(", ")
+            tempo = int(line[-1])
+            voices = int(line[-2])
+        except:
+            print(file)
+    info.append([voices, tempo, file])
+ 
+#Find files that have only 4 voices
+voices = 4
+file_info = [x for x in info if x[0] <= (voices+1)]
+files = [x[-1] for x in file_info]
+len(files)
+
+
+
+# Process all of those files together
+def process_all(target_voice_number):
+    file_info = [x for x in info if x[0] <= (target_voice_number+1)]
+    files = [x[-1] for x in file_info]
+    print(len(files), "files found")  
+    # Process all files
+    all_data = []
+    for file in files:
+        data = encode(file)
+        # Add empty lines for any unused voices
+        while data.shape[1] < target_voice_number:
+            empty_voice = np.zeros([len(data),1])
+            data = np.hstack([data,empty_voice])
+        for line in data:
+            all_data.append(line)
+    print("Done")
+    return all_data
+
+all_data = process_all(4)
 
 
 def save_data(filename, data): #For training NN
