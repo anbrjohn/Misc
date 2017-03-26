@@ -49,7 +49,7 @@ Each row represents a time step. During processing, the "granularity" can be adj
 My Model:
 -----
 
-I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks or fewer (5 tracks total becaise the first track never is always just metadata like speed and volume changes, which I ignore). This is the majority of the files. For files with fewer than 4 tracks, I currently just return silence for the other tracks. I used a NN with 2 LSTM laters of 100-nodes each with 0.2 percent dropout, one more hidden layer of 100-nodes, and an activation layer.
+I scraped [this site](http://www.bachcentral.com/midiindexcomplete.html) for Bach midis, and for now only processed the ones with 4 instrument tracks or fewer (5 tracks total because the first track never is always just metadata like speed and volume changes, which I ignore). This is the majority of the files. For files with fewer than 4 tracks, I currently just return silence for the other tracks. I used a NN with 2 LSTM laters of 100-nodes each with 0.2 percent dropout, one more hidden layer of 100-nodes, and an activation layer.
 
 I debated how to best organize my data and tried various approaches. I believe that converting all the input training data (with a sequence length of 3) to one-hot encoding for each track and doing the same for the output training data would lead to the best results, but it takes much, much longer to train. I toyed around with "4hot" encoding, where each track it marked with a 1 in a vector that represents every possible note and silence (around 100), but that doesn't capture which voice is responsible for which note, nor does it distinguish when multiple voices are playing the same note.
 
