@@ -57,7 +57,5 @@ I settled with dividing the input data as is by 100 to feed the network floats i
 
 As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even has chords and a somewhat complex rhythm in which the voices play well together, which I think is very promising! Still, it is a far cry from a fugue. When I have some time, I will train it longer and see what I get.
 
-*Listen [here](https://soundcloud.com/user-758753778/1epochs)!* Converted to standard notation, this is what the model produced:
-
-![My image](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1e5.pdf)
+*Listen [here](https://soundcloud.com/user-758753778/1epochs)!* Converted to standard notation, [this](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1e5.pdf) is what the model produced.
 
