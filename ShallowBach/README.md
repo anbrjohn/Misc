@@ -15,6 +15,10 @@ And from other similar projects:
 Status:
 -----
 
+Listen [here](https://soundcloud.com/user-758753778/1epochs) to training after 1 epoch (12 minutes on laptop CPU)
+
+Converted to standard notation, [this](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1e5.pdf) is what the model produced.
+
 Very much a work-in-progress.
 I hope to steadily chip away at it whenever I get tired of the homework that I actually should be doing.
 Lots of Frankencode. Beware!
@@ -55,9 +59,5 @@ I debated how to best organize my data and tried various approaches. I believe t
 
 I settled with dividing the input data as is by 100 to feed the network floats in the range [0.0, 1.0). I didn't like the idea of a minor change in value (eg. 0.56 to 0.57) potentially meaning the difference between a well-formed chord and dissonance, but this was my compromise. I did, however, convert the output (y) training data into a one-hot vector for each track. When generating a new file, it then uses the predict function and samples from the probability distribution (restricted to the top-n) for some variety.
 
-As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even has chords and a somewhat complex rhythm in which the voices play well together, which I think is very promising! Still, it is a far cry from a fugue. When I have some time, I will train it longer and see what I get.
-
-*Listen [here](https://soundcloud.com/user-758753778/1epochs)!* Converted to standard notation, [this](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1e5.pdf) is what the model produced.
-
-I also created a MIDI after training for 10 epochs, and one that was generated completely at random (to make me feel better about my model).
+As a proof of concept, I trained this model for just one epoch. The good news is that its output is well-formatted (Bach joke: well-tempered) in that it can sucessfully be converted back into a midi file. It even has chords and a somewhat complex rhythm in which the voices play well together, which I think is very promising! Still, it is a far cry from a fugue. When I have some time, I will train it longer and see what I get. So far, I have also created a MIDI after training for 10 epochs. I also made one that was generated completely at random for comparison (read: to make me feel better about my model).
 
