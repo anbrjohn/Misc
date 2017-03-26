@@ -59,5 +59,5 @@ As a proof of concept, I trained this model for just one epoch. The good news is
 
 *Listen [here](https://soundcloud.com/user-758753778/1epochs)!* Converted to standard notation, this is what the model produced:
 
-![My image](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1epoch.png)
+![My image](https://github.com/anbrjohn/Misc/blob/master/ShallowBach/1e5.pdf)
 
