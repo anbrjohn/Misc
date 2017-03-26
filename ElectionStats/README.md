@@ -1,4 +1,5 @@
-###Playing around with votings statistics from the 2016 US presidential eleciton###
+Playing around with votings statistics from the 2016 US presidential eleciton
+-----
 
 The electoral college directs a lot of focus to "red states" and "blue states", but I was curious what patterns emerged at the county level. Specifically, I wanted to test the urban-rural divide narrative by seeing how the population of a county correlated with voting patterns.
 
@@ -60,14 +61,17 @@ However, the graph clearly shows some outliers. Below are the top-20 most unexpe
 19| Brooks County, TX	        |Population: 7,237 	    |Percent for DEM: 74.61%
 20| Tunica County, MS	        |Population: 10,560 	  |Percent for DEM: 74.42%
 
-###Observations:###
+Observations:
+-----
+
 In general, an outlier is a county with a very large population that still had a large GOP voting base or a small county that had a relatively large Democrat vote. It's worth noting that this model still suggests that there should be around one-third of the vote for the Democrats even in the smallest of counties. That is why very small counties like Roberts County, TX still made the list if they voted almost entirely Republican.
 
 Additionally, although the "deep south" is associated with being very conservative politically, multiple small counties in Alabama and Mississippi made the list for voting unexpectedly Democrat. Other regions such as the Rockies and the Midwest, which also have many small-population counties, nevertheless strayed less from the norm than these. This dichotomy is likely due to demographic differences.
 
 Interestingly, many of the unexpected counties for both parties are from Texas. This suggests that some factor(s) other than population is affecting voting patterns there. Also, this model is probably overly simplified, especially the quadratic regression.
 
-###Map:###
+Map:
+-----
 
 ![My image](https://github.com/anbrjohn/Misc/blob/master/newmap.png)
 
